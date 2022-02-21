@@ -12,6 +12,18 @@ class StreamReassembler {
   private:
     // Your code here -- add private members as necessary.
 
+    // 需要注意 --- capacity包含两部分
+    // 1.byte_stream中的字节数 --- reassembled ByteStream
+    // 2.StreamReassembler中的缓冲区 --- The maximum number of bytes that can be used by “unassembled” substrings
+    // 通过buffer和flag存储数据流
+
+    // mistake1 --- 通过deque存储数据时,
+    std::deque<char> _reassembler_buffer;  //!< The unassembled strings
+    std::deque<bool> _flag;                //!< buffer bitmap
+    size_t _bytes_unreassembled;
+    bool _eof;
+    size_t _eof_index;  //!< the last byte write in byte stream
+
     ByteStream _output;  //!< The reassembled in-order byte stream
     size_t _capacity;    //!< The maximum number of bytes
 
