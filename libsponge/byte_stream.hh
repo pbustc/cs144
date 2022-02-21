@@ -2,7 +2,8 @@
 #define SPONGE_LIBSPONGE_BYTE_STREAM_HH
 
 #include <string>
-
+#include <deque>
+#include <algorithm>
 //! \brief An in-order byte stream.
 
 //! Bytes are written on the "input" side and read from the "output"
@@ -11,7 +12,13 @@
 class ByteStream {
   private:
     // Your code here -- add private members as necessary.
-
+    // 不适用queue --- queue所有元素的进出都必须符合‘先进先出’的条件
+    // queue不提供遍历功能,也不提供迭代器
+    size_t _capacity;
+    std::deque<char> _msg_queue;
+    size_t _bytes_written;
+    size_t _bytes_read;
+    bool _input_end;
     // Hint: This doesn't need to be a sophisticated data structure at
     // all, but if any of your tests are taking longer than a second,
     // that's a sign that you probably want to keep exploring
