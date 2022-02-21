@@ -16,17 +16,17 @@ ByteStream::ByteStream(const size_t capacity)
     : _capacity(capacity), _msg_queue(), _bytes_written(0), _bytes_read(0), _input_end(false) {}
 
 size_t ByteStream::write(const string &data) {
-    if (_input_end) return 0;
+    if (_input_end)
+        return 0;
     size_t write_size = min(data.size(), remaining_capacity());
 
     // 保证最大容量为capacity
-    for (size_t i = 0;i < write_size; ++i) {
+    for (size_t i = 0; i < write_size; ++i) {
         _msg_queue.push_back(data[i]);
     }
     _bytes_written += write_size;
     return write_size;
 }
-
 
 //! \param[in] len bytes will be copied from the output side of the buffer
 string ByteStream::peek_output(const size_t len) const {
@@ -38,7 +38,7 @@ string ByteStream::peek_output(const size_t len) const {
 void ByteStream::pop_output(const size_t len) {
     size_t pop_size = min(len, buffer_size());
     _bytes_read += pop_size;
-    for (size_t i = 0; i < pop_size; ++i){
+    for (size_t i = 0; i < pop_size; ++i) {
         _msg_queue.pop_front();
     }
     return;
@@ -53,9 +53,7 @@ std::string ByteStream::read(const size_t len) {
     return readstr;
 }
 
-
-
-void ByteStream::end_input() {_input_end = true;}
+void ByteStream::end_input() { _input_end = true; }
 
 bool ByteStream::input_ended() const { return _input_end; }
 

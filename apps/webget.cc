@@ -15,10 +15,10 @@ void get_URL(const string &host, const string &path) {
     tcps.write("Host: " + host + "\r\n");
     tcps.write("Connection: close\r\n");
     tcps.write("\r\n");
-         
+
     while (!tcps.eof()) {
         cout << tcps.read();
-    }   
+    }
 
     // You will need to connect to the "http" service on
     // the computer whose name is in the "host" string,
@@ -29,7 +29,7 @@ void get_URL(const string &host, const string &path) {
     // the "eof" (end of file).
 
     // cerr << "Function called: get_URL(" << host << ", " << path << ").\n";
-    // cerr << "Warning: get_URL() has not been implemented yet.\n";    
+    // cerr << "Warning: get_URL() has not been implemented yet.\n";
 }
 
 int main(int argc, char *argv[]) {
