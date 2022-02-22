@@ -1,0 +1,28 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "sponge debug",//!挑个容易识别的名�?
+			"type": "cppdbg",
+			"request": "launch",
+			"program": "${workspaceFolder}/build/tests/${fileBasenameNoExtension}", //!设置为测试程序源码相对应的目标程序路�?
+			"args": [],
+			"stopAtEntry": false,
+			"cwd": "${workspaceFolder}",
+			"environment": [],
+			"externalConsole": false,
+			"MIMode": "gdb",
+			"setupCommands": [
+				{
+					"description": "�? gdb 启用整齐打印",
+					"text": "-enable-pretty-printing",
+					"ignoreFailures": true
+				}
+			],
+			"console": "integratedTerminal",
+			//"preLaunchTask": "C/C++: g++-8 build active file",  //!不需要前置任�?
+			"miDebuggerPath": "/usr/bin/gdb"
+			
+		}
+	]
+}

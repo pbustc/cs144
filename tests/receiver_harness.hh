@@ -14,6 +14,7 @@
 #include <sstream>
 #include <string>
 
+// 作为测试Expectation和Action的基函数
 struct ReceiverTestStep {
     virtual std::string to_string() const { return "ReceiverTestStep"; }
     virtual void execute(TCPReceiver &) const {}
@@ -25,6 +26,7 @@ class ReceiverExpectationViolation : public std::runtime_error {
     ReceiverExpectationViolation(const std::string msg) : std::runtime_error(msg) {}
 };
 
+// 测试Expection的虚基类
 struct ReceiverExpectation : public ReceiverTestStep {
     std::string to_string() const { return "Expectation: " + description(); }
     virtual std::string description() const { return "description missing"; }
@@ -32,6 +34,7 @@ struct ReceiverExpectation : public ReceiverTestStep {
     virtual ~ReceiverExpectation() {}
 };
 
+// Expectation --- State
 struct ExpectState : public ReceiverExpectation {
     std::string _state;
 
@@ -45,6 +48,7 @@ struct ExpectState : public ReceiverExpectation {
     }
 };
 
+// Expectation --- Ackno
 struct ExpectAckno : public ReceiverExpectation {
     std::optional<WrappingInt32> _ackno;
 
@@ -68,6 +72,7 @@ struct ExpectAckno : public ReceiverExpectation {
     }
 };
 
+// Expectation --- Window size
 struct ExpectWindow : public ReceiverExpectation {
     size_t _window;
 
@@ -84,6 +89,7 @@ struct ExpectWindow : public ReceiverExpectation {
     }
 };
 
+// Expectation --- Unassembled bytes
 struct ExpectUnassembledBytes : public ReceiverExpectation {
     size_t _n_bytes;
 
@@ -100,6 +106,7 @@ struct ExpectUnassembledBytes : public ReceiverExpectation {
     }
 };
 
+// Expectation --- bytes_written
 struct ExpectTotalAssembledBytes : public ReceiverExpectation {
     size_t _n_bytes;
 
@@ -116,6 +123,7 @@ struct ExpectTotalAssembledBytes : public ReceiverExpectation {
     }
 };
 
+// Expection --- eof
 struct ExpectEof : public ReceiverExpectation {
     ExpectEof() {}
     std::string description() const { return "receiver.stream_out().eof() == true"; }
@@ -128,6 +136,7 @@ struct ExpectEof : public ReceiverExpectation {
     }
 };
 
+// Expectation --- input_ended()
 struct ExpectInputNotEnded : public ReceiverExpectation {
     ExpectInputNotEnded() {}
     std::string description() const { return "receiver.stream_out().input_ended() == false"; }
@@ -140,6 +149,7 @@ struct ExpectInputNotEnded : public ReceiverExpectation {
     }
 };
 
+// Expectation --- bytes_read
 struct ExpectBytes : public ReceiverExpectation {
     std::string _bytes;
 
@@ -167,6 +177,7 @@ struct ExpectBytes : public ReceiverExpectation {
     }
 };
 
+// test Action的虚基类
 struct ReceiverAction : public ReceiverTestStep {
     std::string to_string() const { return "Action:      " + description(); }
     virtual std::string description() const { return "description missing"; }
@@ -174,6 +185,7 @@ struct ReceiverAction : public ReceiverTestStep {
     virtual ~ReceiverAction() {}
 };
 
+// Action的Segment
 struct SegmentArrives : public ReceiverAction {
     enum class Result { NOT_SYN, OK };
 
@@ -267,6 +279,7 @@ struct SegmentArrives : public ReceiverAction {
         return o.str();
     }
 
+    // 实际调用TCPReceiver进行测试
     void execute(TCPReceiver &receiver) const override {
         TCPSegment seg = build_segment();
         std::ostringstream o;
@@ -275,6 +288,7 @@ struct SegmentArrives : public ReceiverAction {
             o << " with data \"" << data << "\"";
         }
 
+        // 调用lab2中的segment_received()
         receiver.segment_received(std::move(seg));
 
         Result res;
@@ -294,7 +308,9 @@ struct SegmentArrives : public ReceiverAction {
 };
 
 class TCPReceiverTestHarness {
+    // 调用TCPReceiver进行测试
     TCPReceiver receiver;
+    // 保存已经成功执行的步骤
     std::vector<std::string> steps_executed;
 
   public:
@@ -304,6 +320,10 @@ class TCPReceiverTestHarness {
            << "capacity=" << capacity << ")";
         steps_executed.emplace_back(ss.str());
     }
+
+    // ReceiverTestStep派生了两个类
+    // 1.ReceiverAction     2.ReceiverExpectation
+    // 通过引用实现多态
     void execute(const ReceiverTestStep &step) {
         try {
             step.execute(receiver);

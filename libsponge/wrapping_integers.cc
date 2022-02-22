@@ -13,10 +13,7 @@ using namespace std;
 //! Transform an "absolute" 64-bit sequence number (zero-indexed) into a WrappingInt32
 //! \param n The input absolute 64-bit sequence number
 //! \param isn The initial sequence number
-WrappingInt32 wrap(uint64_t n, WrappingInt32 isn) {
-    DUMMY_CODE(n, isn);
-    return WrappingInt32{0};
-}
+WrappingInt32 wrap(uint64_t n, WrappingInt32 isn) { return WrappingInt32(n + isn.raw_value()); }
 
 //! Transform a WrappingInt32 into an "absolute" 64-bit sequence number (zero-indexed)
 //! \param n The relative sequence number
@@ -29,6 +26,10 @@ WrappingInt32 wrap(uint64_t n, WrappingInt32 isn) {
 //! and the other stream runs from the remote TCPSender to the local TCPReceiver and
 //! has a different ISN.
 uint64_t unwrap(WrappingInt32 n, WrappingInt32 isn, uint64_t checkpoint) {
-    DUMMY_CODE(n, isn, checkpoint);
-    return {};
+    // 几乎不可能出现相邻到达的两个segment序号差值超过UINT32_MAX的情况
+    // 所以两个连续到达的TCP包，其absolute seqno相差不会超过UINT32_MAX
+    int32_t interval = n - wrap(checkpoint, isn);
+    int64_t ret = checkpoint + interval;
+    // 出现的特殊情况 --- n=0,checkpoint=0,isn=2^32-2
+    return ret >= 0 ? ret : ret + _UINT32_MAX_;
 }
