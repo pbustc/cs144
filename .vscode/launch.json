@@ -4,12 +4,11 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
         {
             "name": "g++-8 - Build and debug active file",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/tests/recv_connect",
+            "program": "${workspaceFolder}/build/tests/send_extra",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

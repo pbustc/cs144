@@ -4,6 +4,7 @@
 #include "byte_stream.hh"
 #include "tcp_config.hh"
 #include "tcp_segment.hh"
+#include "tcp_timer.hh"
 #include "wrapping_integers.hh"
 
 #include <functional>
@@ -31,6 +32,28 @@ class TCPSender {
 
     //! the (absolute) sequence number for the next byte to be sent
     uint64_t _next_seqno{0};
+
+    //! implementation of lab3
+    // 已经确认的absolute sequence number
+    uint64_t _recv_ackno{0};
+
+    // 记录需要重传的
+    std::queue<TCPSegment> _segments_outstanding{};
+
+    // windows size in receiver
+    // 每接收到一个receiver的segment对其进行一次更新
+    size_t _recv_winsize{0};
+
+    // 记录是否已经发出syn和fin信号
+    bool _fin{};
+
+    // 对定时器的封装
+    TCPTimer _tcptimer;
+    // 连续重传次数
+    size_t _consecutive_retransmissions{0};
+
+    // 发送一个TCPSegment
+    void send_tcpsegment(TCPSegment &);
 
   public:
     //! Initialize a TCPSender
@@ -66,7 +89,7 @@ class TCPSender {
     //! \brief How many sequence numbers are occupied by segments sent but not yet acknowledged?
     //! \note count is in "sequence space," i.e. SYN and FIN each count for one byte
     //! (see TCPSegment::length_in_sequence_space())
-    size_t bytes_in_flight() const;
+    size_t bytes_in_flight() const { return _next_seqno - _recv_ackno; }
 
     //! \brief Number of consecutive retransmissions that have occurred in a row
     unsigned int consecutive_retransmissions() const;

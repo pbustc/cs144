@@ -98,6 +98,7 @@ int main() {
             test.execute(AckReceived{WrappingInt32{isn + 1}}.with_win(1000));
             test.execute(ExpectState{TCPSenderStateSummary::SYN_ACKED});
             test.execute(WriteBytes("abc"));
+
             test.execute(ExpectSegment{}.with_payload_size(3).with_data("abc").with_seqno(isn + 1));
             test.execute(Tick{rto - 5});
             test.execute(WriteBytes("def"));
@@ -235,6 +236,7 @@ int main() {
 
             TCPSenderTestHarness test{"Don't add FIN if this would make the segment exceed the receiver's window", cfg};
             test.execute(ExpectSegment{}.with_no_flags().with_syn(true).with_payload_size(0).with_seqno(isn));
+            test.execute(ExpectState{TCPSenderStateSummary::SYN_SENT});
             test.execute(WriteBytes("abc").with_end_input(true));
             test.execute(AckReceived{WrappingInt32{isn + 1}}.with_win(3));
             test.execute(ExpectState{TCPSenderStateSummary::SYN_ACKED});

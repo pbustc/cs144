@@ -14,6 +14,7 @@ string TCPState::state_summary(const TCPReceiver &receiver) {
     }
 }
 
+// TCPSenderµÄ6ÖÖ×´Ì¬
 string TCPState::state_summary(const TCPSender &sender) {
     if (sender.stream_in().error()) {
         return TCPSenderStateSummary::ERROR;

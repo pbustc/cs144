@@ -18,6 +18,7 @@
 
 const unsigned int DEFAULT_TEST_WINDOW = 137;
 
+// SenderTest虚基类
 struct SenderTestStep {
     virtual operator std::string() const { return "SenderTestStep"; }
     virtual void execute(TCPSender &, std::queue<TCPSegment> &) const {}
@@ -29,6 +30,7 @@ class SenderExpectationViolation : public std::runtime_error {
     SenderExpectationViolation(const std::string msg) : std::runtime_error(msg) {}
 };
 
+// Fault --- segment
 class SegmentExpectationViolation : public SenderExpectationViolation {
   public:
     SegmentExpectationViolation(const std::string &msg) : SenderExpectationViolation(msg) {}
@@ -47,6 +49,7 @@ class SegmentExpectationViolation : public SenderExpectationViolation {
     }
 };
 
+// Fault --- Sender
 struct SenderExpectation : public SenderTestStep {
     operator std::string() const { return "Expectation: " + description(); }
     virtual std::string description() const { return "description missing"; }
@@ -54,6 +57,7 @@ struct SenderExpectation : public SenderTestStep {
     virtual ~SenderExpectation() {}
 };
 
+// Sender wrong state
 struct ExpectState : public SenderExpectation {
     std::string _state;
 
@@ -67,6 +71,7 @@ struct ExpectState : public SenderExpectation {
     }
 };
 
+// Sender wrong seqno
 struct ExpectSeqno : public SenderExpectation {
     WrappingInt32 _seqno;
 
@@ -83,6 +88,7 @@ struct ExpectSeqno : public SenderExpectation {
     }
 };
 
+// Sender wrong bytes_in_flight
 struct ExpectBytesInFlight : public SenderExpectation {
     size_t _n_bytes;
 
@@ -99,6 +105,7 @@ struct ExpectBytesInFlight : public SenderExpectation {
     }
 };
 
+// Sender should not send segment
 struct ExpectNoSegment : public SenderExpectation {
     ExpectNoSegment() {}
     std::string description() const { return "no (more) segments"; }
@@ -115,6 +122,7 @@ struct ExpectNoSegment : public SenderExpectation {
     }
 };
 
+// SenderAction的虚基类
 struct SenderAction : public SenderTestStep {
     operator std::string() const { return "Action:      " + description(); }
     virtual std::string description() const { return "description missing"; }
@@ -122,6 +130,7 @@ struct SenderAction : public SenderTestStep {
     virtual ~SenderAction() {}
 };
 
+// 向TCPSender中的Byte_Stream写入字节
 struct WriteBytes : public SenderAction {
     std::string _bytes;
     bool _end_input;
@@ -150,6 +159,7 @@ struct WriteBytes : public SenderAction {
     }
 };
 
+// Sender中的tick函数
 struct Tick : public SenderAction {
     size_t _ms;
     std::optional<bool> max_retx_exceeded{};
@@ -188,6 +198,7 @@ struct Tick : public SenderAction {
     }
 };
 
+// Sender中的ack_received
 struct AckReceived : public SenderAction {
     WrappingInt32 _ackno;
     std::optional<uint16_t> _window_advertisement{};
@@ -210,6 +221,8 @@ struct AckReceived : public SenderAction {
     }
 };
 
+// Sender中的close
+// 即将Sender中Byte_Stream中写入EOF
 struct Close : public SenderAction {
     Close() {}
     std::string description() const { return "close"; }
@@ -220,6 +233,7 @@ struct Close : public SenderAction {
     }
 };
 
+// 定义一个TCPSegment
 struct ExpectSegment : public SenderExpectation {
     std::optional<bool> ack{};
     std::optional<bool> rst{};
