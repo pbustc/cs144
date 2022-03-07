@@ -138,7 +138,7 @@ void TCPSender::ack_received(const WrappingInt32 ackno, const uint16_t window_si
     }
     // 3. reset the count of ¡°consecutive retransmissions¡± back to zero.
     _consecutive_retransmissions = 0;
-
+    fill_window();
     return;
 }
 

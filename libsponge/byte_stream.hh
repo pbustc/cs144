@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <deque>
 #include <string>
+#include <iostream>
 //! \brief An in-order byte stream.
 
 //! Bytes are written on the "input" side and read from the "output"

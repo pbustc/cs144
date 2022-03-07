@@ -6,6 +6,8 @@
 #include "tcp_sender.hh"
 #include "tcp_state.hh"
 
+#include <iostream>
+
 //! \brief A complete endpoint of a TCP connection
 class TCPConnection {
   private:
@@ -20,6 +22,21 @@ class TCPConnection {
     //! for 10 * _cfg.rt_timeout milliseconds after both streams have ended,
     //! in case the remote TCPConnection doesn't know we've received its whole stream?
     bool _linger_after_streams_finish{true};
+
+    //! activity of the tcp connection
+    bool _active{true};
+
+    //! time since last segment received
+    size_t _time_since_last_segment_received{0};
+
+    //! add some private methods
+    //! TCPConnection send a segment with seqno,SYN,payload,FIN(form sender)
+    //! and ackno,window_size(form receiver)
+    void send_whole_tcpsegment();
+
+    void clean_shutdown();
+
+    void unclean_shutdown();
 
   public:
     //! \name "Input" interface for the writer
@@ -64,6 +81,7 @@ class TCPConnection {
 
     //! Called when a new segment has been received from the network
     void segment_received(const TCPSegment &seg);
+
 
     //! Called periodically when time elapses
     void tick(const size_t ms_since_last_tick);

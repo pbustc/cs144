@@ -19,12 +19,13 @@ size_t ByteStream::write(const string &data) {
     if (_input_end)
         return 0;
     size_t write_size = min(data.size(), remaining_capacity());
-
+    
     // 保证最大容量为capacity
     for (size_t i = 0; i < write_size; ++i) {
         _msg_queue.push_back(data[i]);
     }
     _bytes_written += write_size;
+    std::cout<<"debug(byte_stream) ---- "<<"write size: "<<write_size<<" ----"<<std::endl;
     return write_size;
 }
 
